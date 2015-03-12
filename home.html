@@ -1,0 +1,137 @@
+<html>
+
+<head>
+	<title>home</title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Roboto:400' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+	<div class="container">
+		<div class="center">
+			<h1 id="time"></h1>
+			<input type="text" id="search" class="text" placeholder="google search" autofocus>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		var upd = function() {
+			var time = new Date();
+			$('#time').text(time.getHours() + ":" + ((time.getMinutes() < 10) ? "0" : "") + time.getMinutes());
+		};
+		upd();
+		setInterval(upd, 1000);
+
+		$('#search').keypress(function(ev) {
+			if (ev.keyCode != 13) {
+				return;
+			}
+			var search = $('#search').val();
+			
+			window.location.href = 'http://google.com/search?q=' + search;
+		});
+
+		// get background
+		$.ajax({
+			url: 'http://api.reddit.com/r/aerialporn+agricultureporn+botanicalporn',
+			success: function(data, status) {
+				if (status != 'success') {
+					console.log("ajax failed");
+					return;
+				}
+				//data = JSON.parse(data);
+				var posts = [];
+				for (var d = 0; d < data.data.children.length; d++) {
+					var c = data.data.children[d].data;
+				
+					if (c.domain == 'imgur.com' || c.domain == 'i.imgur.com' || /\.(jpg)|\.(png)|\.(jpeg)/.test(c.url)) {
+						posts.push(c);
+					} else {
+					}
+
+				}
+				if (posts.length == 0) {
+					console.log("got no applicable posts");
+					return;
+				}
+
+				var sel = posts[Math.floor(Math.random() * posts.length)];
+				var url = ( (sel.domain == 'imgur.com') ? sel.url + '.png' : sel.url);
+				var bg = new Image();
+
+				bg.onload = function(ev) {
+					$('body').css({'background-image': 'url(' + url + ')'});
+					console.log('set bg image');
+				}
+				console.log('loading ' + url);
+				bg.src = url;
+
+			}
+		});
+	</script>
+
+	<style type="text/css">
+		html {
+			font-family: 'Roboto', sans-serif;
+		}
+		body {
+			background-repeat: no-repeat;
+			background-size: cover;
+			background-color: #333;
+		}
+		* {
+			margin: 0px;
+		}
+		h1 {
+			font-size: 12em;
+			margin: 0px;
+			color: #fff;
+		}
+		input {
+			font-size: 1.5em;
+			border: none;
+			padding-bottom: .25em;
+			border-bottom: 1px solid #fff;
+			width: 85%;
+			color: #eee;
+			background-color: rgba(0,0,0,0);
+		}
+		input[placeholder] {
+			color: #fff !important;
+		}
+		input:focus {
+			outline: none;
+		}
+		.container {
+			height: 100vh;
+			width: 100vw;
+			text-align: center;
+			vertical-align: middle;
+			display: table-cell;
+			padding: auto;
+		}
+
+		.center {
+			display: inline-block;
+		}
+
+		::-webkit-input-placeholder { /* WebKit browsers */
+			color: #ccc;
+		}
+		:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+			color: #ccc;
+			opacity: 1;
+		}
+		::-moz-placeholder { /* Mozilla Firefox 19+ */
+			color: #ccc;
+			opacity: 1;
+		}
+		:-ms-input-placeholder { /* Internet Explorer 10+ */
+			color: #ccc;
+		}
+	</style>
+</body>
+
+
+
+</html>
